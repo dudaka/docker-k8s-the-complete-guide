@@ -1,70 +1,65 @@
-# Getting Started with Create React App
+# Docker and Kubernetes: The Complete Guide
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Link: https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/
 
-## Available Scripts
+## Commands
 
-In the project directory, you can run:
+### Manipulating Containers 
 
-### `npm start`
+* docker run <image name>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* docker create <image name>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+* docker start <container id>
 
-### `npm test`
+* docker ps --all
+list all containers including the ones already stopped.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* docker system prune
+remove all resources created when working with containers
 
-### `npm run build`
+* docker logs <container id>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* docker stop <container id>
+sends a SIGTERM signal to the process inside the container -> take times
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* docker kill <container id>
+sends a SIGKILL signal -> immediately
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* docker exec -it <container id> <command>
 
-### `npm run eject`
+* docker run -it <image name> sh
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Building Custom Images
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### Creating a Dockerfile
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. Specify a base image
+FROM alpine
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2. Run some commands to install additional programs
+RUN apk add --update redis
 
-## Learn More
+3. Specify a command to run on container startup
+CMD ["redis-server"]
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* docker build .
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+* docker build -t <your docker id>/<image name>:<tag (version)> <dir-containing-dockerfile>
 
-### Code Splitting
+#### Generating Docker Image with Docker Commit
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. Start a container
+2. Access to the running container 
+3. Install dependencies
+4. Commit the changes
+* docker commit -c 'CMD ["redis-server"]' <running-container-id>
+* docker commit -c <starting-command> <running-container-id>
 
-### Analyzing the Bundle Size
+## Simpleweb project
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+WORKDIR /usr/app
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+cd simpleweb
+docker build -t dudaka/simpleweb .
+docker run -p 5000:8080 dudaka/simpleweb
